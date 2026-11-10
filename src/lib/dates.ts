@@ -1,4 +1,4 @@
-import { DAYS, dayForWeekday, type WorkoutDay } from '../data/plan';
+import type { DayPlan, Plan } from '../data/plan';
 
 /** Local date as "YYYY-MM-DD". */
 export function dateKey(d: Date): string {
@@ -34,16 +34,17 @@ export function dateInThisWeek(weekday: number, today = startOfToday()): Date {
   return addDays(mondayOf(today), offset);
 }
 
-export function workoutFor(d: Date): WorkoutDay | undefined {
-  return dayForWeekday(d.getDay());
-}
-
 /** Next workout day after `from` (not including it). */
-export function nextWorkout(from: Date): { date: Date; day: WorkoutDay } {
+export function nextWorkout(plan: Plan, from: Date): { date: Date; day: DayPlan } | null {
   for (let i = 1; i <= 7; i++) {
     const d = addDays(from, i);
-    const day = workoutFor(d);
+    const day = plan[d.getDay()];
     if (day) return { date: d, day };
   }
-  return { date: from, day: DAYS[0] };
+  return null;
+}
+
+export function formatTime(hour: number, minute: number): string {
+  const h = hour % 12 === 0 ? 12 : hour % 12;
+  return `${h}:${String(minute).padStart(2, '0')} ${hour < 12 ? 'AM' : 'PM'}`;
 }

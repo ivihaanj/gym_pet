@@ -55,13 +55,13 @@ export function RestTimer() {
   return (
     <Pressable
       onPress={toggle}
-      style={[styles.pill, { backgroundColor: running ? c.accent : c.text }]}
+      style={[styles.pill, running ? c.accentRaised : c.raised]}
       accessibilityRole="button"
       accessibilityLabel={running ? `Rest timer, ${left} seconds left. Tap to stop.` : 'Start 60 second rest timer'}
     >
       <Animated.View style={[styles.fill, { width, backgroundColor: 'rgba(255,255,255,0.18)' }]} />
-      <Ionicons name={running ? 'stop' : 'timer-outline'} size={16} color={c.bg} />
-      <Text style={[styles.text, { color: c.bg }]}>{running ? `${left}s` : '60s'}</Text>
+      <Ionicons name={running ? 'stop' : 'timer-outline'} size={16} color={running ? c.onAccent : c.accent} />
+      <Text style={[styles.text, { color: running ? c.onAccent : c.accent }]}>{running ? `${left}s` : '60s'}</Text>
     </Pressable>
   );
 }
@@ -78,11 +78,6 @@ const styles = StyleSheet.create({
     height: 44,
     borderRadius: 22,
     overflow: 'hidden',
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 3 },
   },
   fill: { position: 'absolute', left: 0, top: 0, bottom: 0 },
   text: { fontSize: 15, fontWeight: '700', fontVariant: ['tabular-nums'], minWidth: 30 },

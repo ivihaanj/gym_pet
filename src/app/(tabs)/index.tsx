@@ -1,44 +1,62 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { Image } from 'expo-image';
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { GameHeader } from '../../components/Game';
 import { WorkoutView } from '../../components/WorkoutView';
-import { nextWorkout, startOfToday, workoutFor } from '../../lib/dates';
+import { WEEKDAY_NAMES } from '../../data/plan';
+import { formatTime, nextWorkout, startOfToday } from '../../lib/dates';
 import { useStore } from '../../lib/store';
 import { useColors } from '../../theme';
 
 export default function TodayScreen() {
   const c = useColors();
-  const { ready } = useStore();
+  const { ready, data } = useStore();
   const today = startOfToday();
-  const day = workoutFor(today);
+  const weekday = today.getDay();
+  const day = data.plan[weekday];
 
   if (!ready) return <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }} />;
+
+  const time = data.reminder.enabled ? ` · ${formatTime(data.reminder.hour, data.reminder.minute)}` : '';
 
   if (day) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }} edges={['top']}>
-        <WorkoutView day={day} date={today} heading={`Today · ${day.name}`} />
+        <WorkoutView
+          weekday={weekday}
+          date={today}
+          heading={`Today · ${WEEKDAY_NAMES[weekday]}${time}`}
+          header={<GameHeader />}
+        />
       </SafeAreaView>
     );
   }
 
-  const next = nextWorkout(today);
+  const next = nextWorkout(data.plan, today);
   return (
-    <SafeAreaView style={[styles.rest, { backgroundColor: c.bg }]}>
-      <View style={[styles.icon, { backgroundColor: c.accentSoft }]}>
-        <Ionicons name="moon-outline" size={32} color={c.accent} />
+    <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }}>
+      <View style={{ padding: 20 }}>
+        <GameHeader />
       </View>
-      <Text style={[styles.title, { color: c.text }]}>Rest day</Text>
-      <Text style={[styles.sub, { color: c.muted }]}>
-        Next: {next.day.name} · {next.day.title}
-      </Text>
+      <View style={styles.rest}>
+        <View style={[styles.icon, c.raised]}>
+          <Image source={require('../../../assets/mascot.png')} style={{ width: 84, height: 84 }} contentFit="contain" />
+        </View>
+        <Text style={[styles.title, { color: c.text }]}>Rest day</Text>
+        <Text style={{ color: c.muted }}>Your pet is resting too.</Text>
+        {next ? (
+          <Text style={[styles.sub, { color: c.muted }]}>
+            Next: {WEEKDAY_NAMES[next.date.getDay()]} · {next.day.title}
+          </Text>
+        ) : null}
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  rest: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10, padding: 24 },
-  icon: { width: 72, height: 72, borderRadius: 36, alignItems: 'center', justifyContent: 'center', marginBottom: 6 },
+  rest: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10, padding: 24, marginTop: -60 },
+  icon: { width: 120, height: 120, borderRadius: 60, alignItems: 'center', justifyContent: 'center', marginBottom: 6 },
   title: { fontSize: 28, fontWeight: '700' },
-  sub: { fontSize: 16 },
+  sub: { fontSize: 16, textAlign: 'center' },
 });

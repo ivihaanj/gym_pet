@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { dateKey, startOfToday } from '../../lib/dates';
-import { currentStreak, useStore, type DayStatus } from '../../lib/store';
+import { useStore, type DayStatus } from '../../lib/store';
 import { useColors, type Colors } from '../../theme';
 
 const WEEK = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
@@ -45,7 +45,7 @@ export default function StatsScreen() {
     if (s === 'complete') done++;
     if (s === 'missed') missed++;
   }
-  const streak = currentStreak(store.status);
+  const streak = store.game.streak;
 
   const shift = (n: number) => setMonth(new Date(month.getFullYear(), month.getMonth() + n, 1));
 
@@ -60,7 +60,7 @@ export default function StatsScreen() {
           <Stat label="Missed" value={missed} c={c} />
         </View>
 
-        <View style={[styles.card, { backgroundColor: c.surface }]}>
+        <View style={[styles.card, c.raised]}>
           <View style={styles.monthRow}>
             <Pressable onPress={() => shift(-1)} hitSlop={10} accessibilityLabel="Previous month">
               <Ionicons name="chevron-back" size={20} color={c.text} />
@@ -117,7 +117,7 @@ export default function StatsScreen() {
 
 function Stat({ label, value, c }: { label: string; value: number; c: Colors }) {
   return (
-    <View style={[styles.stat, { backgroundColor: c.surface }]}>
+    <View style={[styles.stat, c.raised]}>
       <Text style={[styles.statValue, { color: c.text }]}>{value}</Text>
       <Text style={[styles.statLabel, { color: c.muted }]}>{label}</Text>
     </View>

@@ -37,12 +37,11 @@ export function CheckBox({ checked, onPress, label, size = 34, accessibilityLabe
       <Animated.View
         style={[
           styles.box,
+          checked ? c.accentRaised : c.inset,
           {
             width: size,
             height: size,
             borderRadius: size / 2,
-            borderColor: checked ? c.accent : c.border,
-            backgroundColor: checked ? c.accent : 'transparent',
             transform: [{ scale }],
           },
         ]}
@@ -58,6 +57,6 @@ export function CheckBox({ checked, onPress, label, size = 34, accessibilityLabe
 }
 
 const styles = StyleSheet.create({
-  box: { borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
+  box: { alignItems: 'center', justifyContent: 'center' },
   label: { fontSize: 13, fontWeight: '600' },
 });

@@ -1,15 +1,17 @@
 # Gym Pet
 
-A simple Android workout tracker for a beginner teen (Expo / React Native).
+A simple workout tracker for a beginner teen (Expo / React Native, Android + web).
 
 - **Today**: today's workout, or "Rest day" and the next workout.
-- **Days**: Monday, Wednesday, Friday, Sunday.
+- **Plan**: your workout days. Tap **Edit** to add, remove, replace or reorder exercises and change sets and reps.
 - **Stats**: monthly calendar, streak, done and missed this month.
+- **Me**: level, XP, streaks and the road to Mr. Olympia.
+- First launch asks for your name, your days (the original 4-day plan is the default; 2, 3, 5, 6 or 7 days, or any custom days) and a workout time with an optional reminder.
 - Works offline. Everything is saved on the phone (AsyncStorage). No login.
 
-## Edit the plan
+## Edit the exercises
 
-All exercise data (names, sets, reps, GIFs, tips, sources) is in one file:
+All exercise data (names, default sets/reps, GIFs, tips, sources), the schedule presets and the levels are in one file:
 [`src/data/plan.ts`](src/data/plan.ts).
 
 ## Run
@@ -17,6 +19,7 @@ All exercise data (names, sets, reps, GIFs, tips, sources) is in one file:
 ```bash
 npm install
 npx expo start          # scan the QR code with Expo Go
+npx expo start --web    # http://localhost:8081
 ```
 
 ## Build an APK
@@ -28,11 +31,14 @@ npx eas-cli@latest build -p android --profile preview
 
 ## Image credits
 
-Exercise GIFs in `assets/exercises/` are made from drawings by **Everkinetic**
-(via Wikimedia Commons), licensed **CC BY-SA 3.0**
-(https://creativecommons.org/licenses/by-sa/3.0/). Each GIF joins the start and
-end drawings into a loop. The GIFs are shared under the same license. The source
-file for each one is listed in `assets/exercises/_commons-sources.json`.
+- Most exercise GIFs in `assets/exercises/` are made from drawings by **Everkinetic**
+  (via Wikimedia Commons; the crunch via wger.de), licensed **CC BY-SA 3.0**
+  (https://creativecommons.org/licenses/by-sa/3.0/). Each GIF joins the start and end drawings into a loop.
+- The goblet squat and suitcase carry GIFs are short clips from videos by **Taco Fleur**
+  (Wikimedia Commons), licensed **CC BY-SA 4.0** (https://creativecommons.org/licenses/by-sa/4.0/).
+- These GIFs are shared under the same licenses. Every source file is listed in
+  `assets/exercises/_image-sources.json`.
+- The app icon / mascot was made with Blueprint Studio Asset Generator.
 
 Tips are short summaries of guidance from ACE, NSCA, ACSM, NHS and KidsHealth.
 Each exercise page in the app links to its sources.
