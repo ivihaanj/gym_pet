@@ -1,8 +1,8 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { SchedulePicker, TimePicker } from '../components/SchedulePicker';
 import { useStore } from '../lib/store';
@@ -15,20 +15,27 @@ export default function Welcome() {
   const store = useStore();
   const [step, setStep] = useState(0);
   const [name, setName] = useState(store.data.name ?? '');
+  const [savingProfile, setSavingProfile] = useState(false);
   const canNext = step !== 0 || name.trim().length > 0;
+
+  // The tab layout protects the main app until a name exists. Wait for the
+  // store update before navigating so Android cannot bounce us back here.
+  useEffect(() => {
+    if (savingProfile && store.data.name?.trim()) router.replace('/');
+  }, [savingProfile, store.data.name]);
 
   const next = () => {
     if (!canNext) return;
     if (step < STEPS.length - 1) setStep(step + 1);
     else {
       store.setName(name);
-      router.replace('/');
+      setSavingProfile(true);
     }
   };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
           <View style={styles.dots}>
             {STEPS.map((s, i) => (
@@ -79,12 +86,12 @@ export default function Welcome() {
           ) : null}
           <Pressable
             onPress={next}
-            disabled={!canNext}
-            style={[styles.next, c.accentRaised, { opacity: canNext ? 1 : 0.4 }]}
+            disabled={!canNext || savingProfile}
+            style={[styles.next, c.accentRaised, { opacity: canNext && !savingProfile ? 1 : 0.4 }]}
             accessibilityRole="button"
           >
             <Text style={{ color: c.onAccent, fontSize: 16, fontWeight: '700' }}>
-              {step === STEPS.length - 1 ? "Let's go" : 'Next'}
+              {savingProfile ? 'Starting…' : step === STEPS.length - 1 ? "Let's go" : 'Next'}
             </Text>
           </Pressable>
         </View>

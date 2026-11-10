@@ -17,7 +17,7 @@ export default function TabLayout() {
         headerShown: false,
         tabBarActiveTintColor: c.accent,
         tabBarInactiveTintColor: c.muted,
-        tabBarStyle: { backgroundColor: c.bg, borderTopWidth: 0, elevation: 0, height: 64, paddingTop: 6 },
+        tabBarStyle: { backgroundColor: c.bg, borderTopWidth: 0, elevation: 0 },
         sceneStyle: { backgroundColor: c.bg },
         animation: 'fade',
       }}

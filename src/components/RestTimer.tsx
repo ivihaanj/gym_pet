@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Haptics from 'expo-haptics';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Animated, Easing, Pressable, StyleSheet, Text, Vibration } from 'react-native';
 import { REST_SECONDS } from '../data/plan';
 import { useColors } from '../theme';
@@ -10,7 +10,7 @@ export function RestTimer() {
   const c = useColors();
   const [endsAt, setEndsAt] = useState<number | null>(null);
   const [left, setLeft] = useState(REST_SECONDS);
-  const fill = useRef(new Animated.Value(0)).current;
+  const fill = useState(() => new Animated.Value(0))[0];
 
   useEffect(() => {
     if (endsAt === null) return;

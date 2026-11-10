@@ -2,7 +2,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Haptics from 'expo-haptics';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { Animated, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { LEVELS } from '../data/plan';
 import { useStore } from '../lib/store';
@@ -43,7 +43,7 @@ export function GameHeader() {
 export function LevelCard() {
   const c = useColors();
   const { game } = useStore();
-  const fill = useRef(new Animated.Value(0)).current;
+  const fill = useState(() => new Animated.Value(0))[0];
   const pct = game.levelSpan ? game.intoLevel / game.levelSpan : 1;
   useEffect(() => {
     Animated.timing(fill, { toValue: pct, duration: 600, useNativeDriver: false }).start();
@@ -71,7 +71,7 @@ export function LevelUpModal() {
   const c = useColors();
   const { game, data, markLevelSeen, ready } = useStore();
   const show = ready && data.name !== null && game.level > data.lastSeenLevel;
-  const scale = useRef(new Animated.Value(0.8)).current;
+  const scale = useState(() => new Animated.Value(0.8))[0];
   useEffect(() => {
     if (show) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});

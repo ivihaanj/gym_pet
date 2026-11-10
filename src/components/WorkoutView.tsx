@@ -28,13 +28,13 @@ export function WorkoutView({ weekday, date, heading, editable, header }: Props)
   const complete = total > 0 && done === total;
   const [editing, setEditing] = useState(false);
 
-  const bar = useRef(new Animated.Value(0)).current;
+  const bar = useState(() => new Animated.Value(0))[0];
   useEffect(() => {
     Animated.timing(bar, { toValue: total ? done / total : 0, duration: 300, useNativeDriver: false }).start();
   }, [done, total, bar]);
 
   // "+10 XP" pop when a box is ticked.
-  const xpPop = useRef(new Animated.Value(0)).current;
+  const xpPop = useState(() => new Animated.Value(0))[0];
   const lastDone = useRef(done);
   useEffect(() => {
     if (done > lastDone.current) {
@@ -44,7 +44,7 @@ export function WorkoutView({ weekday, date, heading, editable, header }: Props)
     lastDone.current = done;
   }, [done, xpPop]);
 
-  const pop = useRef(new Animated.Value(complete ? 1 : 0)).current;
+  const pop = useState(() => new Animated.Value(complete ? 1 : 0))[0];
   const wasComplete = useRef(complete);
   useEffect(() => {
     Animated.spring(pop, { toValue: complete ? 1 : 0, friction: 6, useNativeDriver: true }).start();
@@ -278,7 +278,7 @@ function EditCard({ item, weekday, first, last, c }: { item: PlanItem; weekday: 
 }
 
 function FadeIn({ children, delay }: { children: React.ReactNode; delay: number }) {
-  const v = useRef(new Animated.Value(0)).current;
+  const v = useState(() => new Animated.Value(0))[0];
   useEffect(() => {
     Animated.timing(v, { toValue: 1, duration: 260, delay, useNativeDriver: true }).start();
   }, [v, delay]);

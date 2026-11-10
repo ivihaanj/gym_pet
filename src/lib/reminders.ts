@@ -19,6 +19,7 @@ export async function askReminderPermission(): Promise<boolean> {
   if (Platform.OS === 'android') {
     await Notifications.setNotificationChannelAsync('workouts', {
       name: 'Workout reminders',
+      // eslint-disable-next-line import/namespace -- exported via 'export *' from a .d.ts enum; the lint resolver misses it
       importance: Notifications.AndroidImportance.HIGH,
     });
   }

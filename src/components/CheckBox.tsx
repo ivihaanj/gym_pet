@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Haptics from 'expo-haptics';
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { Animated, Pressable, StyleSheet, Text } from 'react-native';
 import { useColors } from '../theme';
 
@@ -14,7 +14,7 @@ type Props = {
 
 export function CheckBox({ checked, onPress, label, size = 34, accessibilityLabel }: Props) {
   const c = useColors();
-  const scale = useRef(new Animated.Value(1)).current;
+  const scale = useState(() => new Animated.Value(1))[0];
 
   useEffect(() => {
     Animated.sequence([
