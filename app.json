@@ -45,7 +45,8 @@
             "backgroundColor": "#1E2026"
           }
         }
-      ]
+      ],
+      "./plugins/withBundledDebugJs"
     ],
     "scheme": "gympet",
     "experiments": {

@@ -70,6 +70,48 @@ function migrateV1(raw: string): Data {
   return d;
 }
 
+/** Accept saved data only if it has the right shape; drop broken parts. */
+function sanitize(x: unknown): Data | null {
+  if (!x || typeof x !== 'object') return null;
+  const d = x as Partial<Data>;
+  const base = freshData();
+  const isObj = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
+  const plan: Plan = {};
+  if (isObj(d.plan)) {
+    for (const [k, day] of Object.entries(d.plan)) {
+      const w = Number(k);
+      if (!(w >= 0 && w <= 6) || !isObj(day) || !Array.isArray((day as DayPlan).items)) continue;
+      const items = (day as DayPlan).items.filter(
+        (i) => i && typeof i.uid === 'string' && EXERCISES[i.exerciseId] && typeof i.sets === 'number' && typeof i.reps === 'string',
+      );
+      plan[w] = { title: typeof (day as DayPlan).title === 'string' ? (day as DayPlan).title : 'Workout', items };
+    }
+  }
+  const logs: Record<string, Log> = {};
+  if (isObj(d.logs)) {
+    for (const [k, l] of Object.entries(d.logs)) {
+      if (/^\d{4}-\d{2}-\d{2}$/.test(k) && isObj(l) && Array.isArray(l.done)) {
+        logs[k] = { done: (l.done as unknown[]).filter((s): s is string => typeof s === 'string'), total: Number(l.total) || 0 };
+      }
+    }
+  }
+  const history = Array.isArray(d.scheduleHistory)
+    ? d.scheduleHistory.filter((h) => h && typeof h.from === 'string' && Array.isArray(h.weekdays))
+    : [];
+  const hasPlan = Object.keys(plan).length >= 1;
+  return {
+    ...base,
+    name: typeof d.name === 'string' && d.name.trim() ? d.name : null,
+    firstUse: typeof d.firstUse === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d.firstUse) ? d.firstUse : base.firstUse,
+    presetId: hasPlan && typeof d.presetId === 'string' ? d.presetId : base.presetId,
+    plan: hasPlan ? plan : base.plan,
+    reminder: isObj(d.reminder) && typeof d.reminder.hour === 'number' ? (d.reminder as Reminder) : base.reminder,
+    scheduleHistory: history.length ? history : base.scheduleHistory,
+    logs,
+    lastSeenLevel: typeof d.lastSeenLevel === 'number' ? d.lastSeenLevel : 0,
+  };
+}
+
 let uidCounter = 0;
 const newUid = () => `u${Date.now().toString(36)}${(uidCounter++).toString(36)}`;
 
@@ -120,21 +162,32 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const loaded = useRef(false);
 
   useEffect(() => {
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      loaded.current = true;
+      setReady(true);
+    };
+    // Never wait forever for storage.
+    const timer = setTimeout(finish, 3000);
     (async () => {
       try {
         const raw = await AsyncStorage.getItem(KEY_V2);
         if (raw) {
-          setData({ ...freshData(), ...(JSON.parse(raw) as Data) });
+          const saved = sanitize(JSON.parse(raw));
+          if (saved && !done) setData(saved);
         } else {
           const old = await AsyncStorage.getItem(KEY_V1);
-          if (old) setData(migrateV1(old));
+          if (old && !done) setData(migrateV1(old));
         }
       } catch {
         // Bad or missing data: start fresh.
       }
-      loaded.current = true;
-      setReady(true);
+      clearTimeout(timer);
+      finish();
     })();
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
